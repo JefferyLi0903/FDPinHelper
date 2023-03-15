@@ -99,6 +99,6 @@ void PinTableWidget::updateItem(const qsizetype index, const PinItem &item) {
 
   auto row = getRow(pin);
   for (int i = 0; i < row.size(); ++i) {
-    table_model_->setItem(index, i, row[i]);
+    table_model_->setItem(static_cast<int>(index), i, row[i]);
   }
 }

@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"cmake.configureSettings": {
+			"QT_ROOT_DIR": "/Applications"
+		},
+		"cmake.generator": "Xcode"
+	}
+}

@@ -14,7 +14,7 @@ else()
     set(CMAKE_PROJECT_INCLUDE_BEFORE "${QT_ROOT_DIR}/Tools/QtCreator/share/qtcreator/package-manager/auto-setup.cmake")
 endif()
 
-set(CMAKE_PREFIX_PATH "${QT_ROOT_DIR}/6.4.0/macos")
+set(CMAKE_PREFIX_PATH "/usr/local/Cellar/qt/6.4.2/Frameworks")
 
 find_package(QT NAMES Qt6 REQUIRED Widgets LinguistTools)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools)
@@ -65,6 +65,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
+
+install(CODE "include(BundleUtilities)
+  fixup_bundle(\"${APPS}\" \"${LIBS}\" \"${DIRS}\")")
 
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})
