@@ -6,7 +6,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 set(CMAKE_CXX_STANDARD 17)
-
+set(QT_ROOT_DIR "/Users/limuhan/Qt")
+set(CMAKE_PREFIX_PATH ${QT_ROOT_DIR}/6.4.3/macos)
 # macOS
 if(APPLE)
     set(CMAKE_PROJECT_INCLUDE_BEFORE "${QT_ROOT_DIR}/Qt Creator.app/Contents/Resources/package-manager/auto-setup.cmake")
@@ -14,10 +15,13 @@ else()
     set(CMAKE_PROJECT_INCLUDE_BEFORE "${QT_ROOT_DIR}/Tools/QtCreator/share/qtcreator/package-manager/auto-setup.cmake")
 endif()
 
-set(CMAKE_PREFIX_PATH "${QT_ROOT_DIR}/6.4.0/macos")
-
 find_package(QT NAMES Qt6 REQUIRED Widgets LinguistTools)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools)
+set(REQUIRED_LIBS ${REQUIRED_LIBS}
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::DBus
+    Qt${QT_VERSION_MAJOR}::Core
+)
 
 add_subdirectory(3rdparty/FlatUI)
 
@@ -68,6 +72,28 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
+
+foreach(LIB ${REQUIRED_LIBS})
+    if(LIB MATCHES "Qt6::")
+        get_target_property(LIB ${LIB} LOCATION_${CMAKE_BUILD_TYPE})
+    endif()
+    get_filename_component(LIB_DIR ${LIB} DIRECTORY)
+    if(LIB_DIR MATCHES ".*framework$")
+        get_filename_component(LIB_DIR ${LIB_DIR} DIRECTORY) 
+    endif()
+    set(LIB_DIRS ${LIB_DIRS}
+        ${LIB_DIR}
+        )
+endforeach()
+
+set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR})
+set(CMAKE_INSTALL_RPATH "@executable_path/../Frameworks")
+install(TARGETS FDPinHelper BUNDLE DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(CODE "
+    include(BundleUtilities)
+    fixup_bundle(FDPinHelper.app \"\" \"${LIB_DIR}\")
+    ")
+
 
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})
